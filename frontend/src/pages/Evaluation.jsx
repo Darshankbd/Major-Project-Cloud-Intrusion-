@@ -16,8 +16,9 @@ import {
   AccuracyCurveChart, 
   FeatureImportanceBarChart 
 } from '../components/ChartComponents';
+import { EvaluatorGuide, StepNavigationFooter } from '../components/StepProgress';
 
-export function Evaluation() {
+export function Evaluation({ setCurrentPage }) {
   const [curvesData, setCurvesData] = useState(null);
   const [cmData, setCmData] = useState(null);
 
@@ -37,9 +38,22 @@ export function Evaluation() {
 
   return (
     <div className="space-y-8 py-4">
+      {/* Evaluator Presentation Guide Script for Step 3 */}
+      <EvaluatorGuide
+        stepNumber="3"
+        title="Model Evaluation & Loss Convergence Analysis"
+        whatToSay='"In Step 3, we analyze the 50-epoch learning convergence dynamics matching Figure 4.2. Training loss steadily decays to 0.182, while validation loss converges to 0.431 without diverging. Our confusion matrix proves a 98.6% overall accuracy with negligible false alarm rate (< 0.4%)."'
+        technicalHighlight="Generalization gap is constrained within 6.0%, proving robust generalization to zero-day vectors. Feature importance highlights that src_bytes (28.4%) and serror_rate (22.1%) are the primary discriminator features."
+      />
+
       {/* Title Header */}
       <div className="border-b border-slate-800 pb-5">
-        <h1 className="text-2xl font-bold text-white">Model Evaluation, Convergence & Feature Graphs</h1>
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold">
+            STEP 3 OF 5
+          </span>
+          <h1 className="text-2xl font-bold text-white">Model Evaluation, Convergence & Feature Graphs</h1>
+        </div>
         <p className="text-xs text-slate-400 font-mono mt-1">
           Interactive 50-Epoch Training Loss & Validation Curves (Figure 4.2), Confusion Matrix Heatmap, and Gini Feature Importance
         </p>
@@ -60,7 +74,7 @@ export function Evaluation() {
             </div>
           </div>
 
-          <div className="h-64 pt-2">
+          <div className="pt-2">
             <LossCurveChart 
               epochs={curvesData?.epochs}
               trainLoss={curvesData?.train_loss}
@@ -86,7 +100,7 @@ export function Evaluation() {
             </div>
           </div>
 
-          <div className="h-64 pt-2">
+          <div className="pt-2">
             <AccuracyCurveChart 
               epochs={curvesData?.epochs}
               trainAcc={curvesData?.train_accuracy}
@@ -112,7 +126,7 @@ export function Evaluation() {
             <span className="text-[11px] font-mono text-cyan-400">Random Forest</span>
           </div>
 
-          <div className="h-64 pt-2">
+          <div className="pt-2">
             <FeatureImportanceBarChart />
           </div>
 
@@ -197,6 +211,15 @@ export function Evaluation() {
           </div>
         </div>
       </div>
+
+      {/* Stepper Navigation Footer */}
+      <StepNavigationFooter
+        currentStep="graphs"
+        setCurrentStep={setCurrentPage}
+        prevStep="train"
+        nextStep="sandbox"
+        nextStepTitle="Step 4: Exploit Sandbox & Threat Verification"
+      />
     </div>
   );
 }

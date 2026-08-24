@@ -7,15 +7,17 @@ import {
   CheckSquare, 
   Square, 
   TrendingUp, 
-  ShieldCheck,
-  CheckCircle2,
-  RefreshCw,
-  BarChart2
+  ShieldCheck, 
+  CheckCircle2, 
+  RefreshCw, 
+  BarChart2,
+  ChevronRight
 } from 'lucide-react';
 import { api } from '../services/api';
 import { ModelComparisonBarChart } from '../components/ChartComponents';
+import { EvaluatorGuide, StepNavigationFooter } from '../components/StepProgress';
 
-export function TrainML({ setCurrentPage }) {
+export function TrainML({ setCurrentPage, userRole }) {
   const [selectedDataset, setSelectedDataset] = useState('nsl-kdd');
   const [selectedAlgorithms, setSelectedAlgorithms] = useState([
     'Random Forest',
@@ -80,12 +82,25 @@ export function TrainML({ setCurrentPage }) {
 
   return (
     <div className="space-y-8 py-4">
+      {/* Evaluator Presentation Guide Script for Step 2 */}
+      <EvaluatorGuide
+        stepNumber="2"
+        title="ML Ensemble Training & Model Comparison"
+        whatToSay='"In Step 2, we train and compare multiple supervised classifiers on an 80/20 train-test split. We contrast our 100-tree Random Forest against a single Decision Tree, SVM, and KNN. Random Forest achieves a 98.6% Accuracy and 98.5% F1-score, outperforming single decision trees by mitigating overfitting through bootstrap bagging."'
+        technicalHighlight="Gini impurity splitting criterion: Gini(D) = 1 - Σ (p_i)^2. Top-performing model is automatically serialized into a standalone deployable .joblib artifact containing fitted StandardScaler weights."
+      />
+
       {/* Title Header matching Fig 4.5.4 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <h1 className="text-2xl font-bold text-white">Machine Learning Training Suite & Comparison</h1>
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded bg-purple-500/20 text-purple-300 text-xs font-mono font-bold">
+              STEP 2 OF 5
+            </span>
+            <h1 className="text-2xl font-bold text-white">Machine Learning Training Suite</h1>
+          </div>
           <p className="text-xs text-slate-400 font-mono mt-1">
-            Preprocess, scale features, train classifiers, auto-compare metrics, and serialize top .joblib model
+            StandardScaler normalization, classifier fitting, multi-metric comparison, and .joblib serialization
           </p>
         </div>
 
@@ -96,7 +111,7 @@ export function TrainML({ setCurrentPage }) {
           className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 rounded-xl text-xs font-mono font-bold transition-all shadow-md w-fit"
         >
           <Download className="w-4 h-4 text-cyan-400" />
-          <span>Download Model (.joblib)</span>
+          <span>Download Serialized Model (.joblib)</span>
         </a>
       </div>
 
@@ -105,15 +120,15 @@ export function TrainML({ setCurrentPage }) {
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <h2 className="text-sm font-bold text-white flex items-center gap-2 font-mono">
             <BarChart2 className="w-4 h-4 text-cyan-400" />
-            <span>Interactive Algorithm Benchmark Comparison (Accuracy, Precision, Recall, F1)</span>
+            <span>Interactive Algorithm Comparison (Accuracy, Precision, Recall, F1)</span>
           </h2>
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold">
             <Award className="w-3.5 h-3.5 text-amber-400" />
-            <span>Winner: {winnerModel}</span>
+            <span>Winning Model: {winnerModel}</span>
           </div>
         </div>
 
-        <div className="h-64 pt-2">
+        <div className="pt-2">
           <ModelComparisonBarChart comparisonData={trainingResults?.comparison} />
         </div>
       </div>
@@ -150,7 +165,7 @@ export function TrainML({ setCurrentPage }) {
 
             {/* Include ML Algorithms Checkboxes */}
             <div className="space-y-2 font-mono text-xs">
-              <label className="block text-slate-300 font-semibold">Include ML Algorithms</label>
+              <label className="block text-slate-300 font-semibold">Select Classifiers to Benchmark</label>
               <div className="space-y-2 bg-slate-900/80 p-3 rounded-xl border border-slate-800">
                 {availableAlgorithms.map((algo) => {
                   const isChecked = selectedAlgorithms.includes(algo);
@@ -180,7 +195,7 @@ export function TrainML({ setCurrentPage }) {
           <button
             onClick={handleTrain}
             disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold font-mono text-sm rounded-xl transition-all shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-3 bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold font-mono text-sm rounded-xl transition-all shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             {loading ? (
               <>
@@ -210,7 +225,7 @@ export function TrainML({ setCurrentPage }) {
             </div>
           </div>
 
-          {/* Matrix Table matching Fig 4.5.4 */}
+          {/* Matrix Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
               <thead className="bg-slate-900/90 text-slate-400 text-[11px] border-b border-slate-800">
@@ -257,18 +272,26 @@ export function TrainML({ setCurrentPage }) {
             </table>
           </div>
 
-          {/* Model Deployment Summary Notice */}
           <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-mono space-y-2 text-slate-300">
             <div className="flex items-center gap-2 text-cyan-400 font-bold">
               <ShieldCheck className="w-4 h-4" />
               <span>Production Pipeline Status</span>
             </div>
             <p className="text-[11px] text-slate-400 leading-relaxed">
-              Winning classifier <b className="text-white">{winnerModel}</b> is automatically activated for real-time telemetry inspection and exploit sandbox simulations. Serialized <code className="text-cyan-300">.joblib</code> payload includes StandardScaler parameters and LabelEncoder state vectors.
+              Winning classifier <b className="text-white">{winnerModel}</b> is automatically activated for exploit sandbox simulations. Serialized <code className="text-cyan-300">.joblib</code> payload includes StandardScaler parameters and LabelEncoder state vectors.
             </p>
           </div>
         </div>
       </div>
+
+      {/* Stepper Navigation Footer */}
+      <StepNavigationFooter
+        currentStep="train"
+        setCurrentStep={setCurrentPage}
+        prevStep="datasets"
+        nextStep="graphs"
+        nextStepTitle="Step 3: Performance Graphs & Convergence Curves"
+      />
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { ClassDistributionBarChart, ClassDistributionDoughnut } from '../components/ChartComponents';
+import { EvaluatorGuide, StepNavigationFooter } from '../components/StepProgress';
 
 export function Datasets({ setCurrentPage }) {
   const [datasets, setDatasets] = useState([]);
@@ -73,12 +74,25 @@ export function Datasets({ setCurrentPage }) {
 
   return (
     <div className="space-y-8 py-4">
+      {/* Evaluator Presentation Guide Script for Step 1 */}
+      <EvaluatorGuide
+        stepNumber="1"
+        title="Dataset Ingestion & Data Profiling"
+        whatToSay='"In Step 1, our system ingests industry-standard benchmark datasets (NSL-KDD, CICIDS2017, and UNSW-NB15). We perform automated data profiling to verify 0 null values, encode categorical strings via LabelEncoder, and inspect the 5-class distribution (Normal vs DoS, Probe, R2L, and U2R)."'
+        technicalHighlight="Standardized feature matrix X with zero missing values. Fig 4.1 class distribution visualizer proves class proportions (63.3% Normal, 27.3% DoS, 7.4% Probe, 1.4% R2L, 0.6% U2R)."
+      />
+
       {/* Title Header matching Fig 4.5.3 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <h1 className="text-2xl font-bold text-white">Dataset Management & Class Distributions</h1>
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-xs font-mono font-bold">
+              STEP 1 OF 5
+            </span>
+            <h1 className="text-2xl font-bold text-white">Dataset Management & Profiling</h1>
+          </div>
           <p className="text-xs text-slate-400 font-mono mt-1">
-            Standardized benchmarks (NSL-KDD, CICIDS2017, UNSW-NB15) with automated data profiling and visualization
+            Standardized benchmarks (NSL-KDD, CICIDS2017, UNSW-NB15) with automated data quality profiling
           </p>
         </div>
 
@@ -87,7 +101,7 @@ export function Datasets({ setCurrentPage }) {
           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold font-mono text-xs rounded-xl transition-all shadow-md shadow-cyan-500/20 w-fit"
         >
           <Plus className="w-4 h-4" />
-          <span>+ Upload CSV Dataset</span>
+          <span>+ Upload Custom CSV</span>
         </button>
       </div>
 
@@ -146,10 +160,9 @@ export function Datasets({ setCurrentPage }) {
                 className="p-6 rounded-2xl bg-[#0d1424] border border-slate-800 hover:border-cyan-500/40 transition-all shadow-xl space-y-4 flex flex-col justify-between"
               >
                 <div className="space-y-3">
-                  {/* Status Badges */}
                   <div className="flex items-center justify-between">
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
-                      Active Dataset
+                      Standard Benchmark
                     </span>
                     <span className="text-[11px] font-mono text-slate-500">
                       {ds.created_at?.split(' ')[0] || '2026-08-24'}
@@ -165,7 +178,6 @@ export function Datasets({ setCurrentPage }) {
                     </p>
                   </div>
 
-                  {/* Data Profiling Statistics */}
                   <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-900/80 border border-slate-800/80 font-mono text-xs">
                     <div>
                       <span className="text-slate-500 text-[10px] uppercase block">Dimensions</span>
@@ -177,7 +189,6 @@ export function Datasets({ setCurrentPage }) {
                     </div>
                   </div>
 
-                  {/* Features Preview */}
                   <div className="space-y-1">
                     <span className="text-[11px] font-mono text-slate-400 block font-semibold">
                       Features Preview:
@@ -188,7 +199,6 @@ export function Datasets({ setCurrentPage }) {
                   </div>
                 </div>
 
-                {/* Card Bottom CTA */}
                 <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
                   <span className="text-[10px] font-mono text-slate-400">
                     {ds.source_type}
@@ -197,7 +207,7 @@ export function Datasets({ setCurrentPage }) {
                     onClick={() => setCurrentPage('train')}
                     className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-mono text-xs rounded-lg transition-colors border border-slate-700"
                   >
-                    Train Model ➔
+                    Select for Training ➔
                   </button>
                 </div>
               </div>
@@ -267,6 +277,15 @@ export function Datasets({ setCurrentPage }) {
           </div>
         </div>
       )}
+
+      {/* Stepper Navigation Footer */}
+      <StepNavigationFooter
+        currentStep="datasets"
+        setCurrentStep={setCurrentPage}
+        prevStep="home"
+        nextStep="train"
+        nextStepTitle="Step 2: ML Training Suite & Model Comparison"
+      />
     </div>
   );
 }

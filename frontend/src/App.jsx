@@ -2,6 +2,7 @@ import React, { useState, Component } from 'react';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { AuthModal } from './components/AuthModal';
+import { StepProgressHeader } from './components/StepProgress';
 
 import { Home } from './pages/Home';
 import { Datasets } from './pages/Datasets';
@@ -58,7 +59,7 @@ export function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [user, setUser] = useState({
-    username: 'admin',
+    username: 'admin_darshan',
     role: 'Admin',
     email: 'admin@cloudids.local'
   });
@@ -70,32 +71,53 @@ export function App() {
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <Home setCurrentPage={setCurrentPage} />;
+        return (
+          <Home 
+            setCurrentPage={setCurrentPage} 
+            user={user} 
+            setUser={setUser} 
+            onOpenAuth={() => setAuthModalOpen(true)} 
+          />
+        );
       case 'datasets':
-        return <Datasets setCurrentPage={setCurrentPage} />;
+        return <Datasets setCurrentPage={setCurrentPage} userRole={user?.role} />;
       case 'train':
-        return <TrainML setCurrentPage={setCurrentPage} />;
+        return <TrainML setCurrentPage={setCurrentPage} userRole={user?.role} />;
       case 'graphs':
-        return <Evaluation />;
+        return <Evaluation setCurrentPage={setCurrentPage} />;
       case 'sandbox':
-        return <ExploitSandbox />;
+        return <ExploitSandbox setCurrentPage={setCurrentPage} />;
       case 'reports':
-        return <Reports />;
+        return <Reports setCurrentPage={setCurrentPage} />;
       default:
-        return <Home setCurrentPage={setCurrentPage} />;
+        return (
+          <Home 
+            setCurrentPage={setCurrentPage} 
+            user={user} 
+            setUser={setUser} 
+            onOpenAuth={() => setAuthModalOpen(true)} 
+          />
+        );
     }
   };
 
   return (
     <ErrorBoundary>
       <div className="min-h-screen flex flex-col bg-[#0a0e17] text-slate-100 selection:bg-cyan-500 selection:text-black">
-        {/* Top Streamlined Navbar */}
+        {/* Top Navbar */}
         <Navbar
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           user={user}
           onOpenAuth={() => setAuthModalOpen(true)}
           onLogout={handleLogout}
+        />
+
+        {/* Synchronous Step Progress Header */}
+        <StepProgressHeader
+          currentStep={currentPage}
+          setCurrentStep={setCurrentPage}
+          userRole={user?.role || 'Admin'}
         />
 
         {/* Main Content Viewport */}
