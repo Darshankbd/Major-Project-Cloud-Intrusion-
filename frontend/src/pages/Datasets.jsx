@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { ClassDistributionBarChart, ClassDistributionDoughnut } from '../components/ChartComponents';
-import { EvaluatorGuide, StepNavigationFooter } from '../components/StepProgress';
+import { StepNavigationFooter } from '../components/StepProgress';
 
 export function Datasets({ setCurrentPage }) {
   const [datasets, setDatasets] = useState([]);
@@ -74,14 +74,6 @@ export function Datasets({ setCurrentPage }) {
 
   return (
     <div className="space-y-8 py-4">
-      {/* Evaluator Presentation Guide Script for Step 1 */}
-      <EvaluatorGuide
-        stepNumber="1"
-        title="Dataset Ingestion & Data Profiling"
-        whatToSay='"In Step 1, our system ingests industry-standard benchmark datasets (NSL-KDD, CICIDS2017, and UNSW-NB15). We perform automated data profiling to verify 0 null values, encode categorical strings via LabelEncoder, and inspect the 5-class distribution (Normal vs DoS, Probe, R2L, and U2R)."'
-        technicalHighlight="Standardized feature matrix X with zero missing values. Fig 4.1 class distribution visualizer proves class proportions (63.3% Normal, 27.3% DoS, 7.4% Probe, 1.4% R2L, 0.6% U2R)."
-      />
-
       {/* Title Header matching Fig 4.5.3 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
@@ -98,7 +90,7 @@ export function Datasets({ setCurrentPage }) {
 
         <button
           onClick={() => setUploadModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold font-mono text-xs rounded-xl transition-all shadow-md shadow-cyan-500/20 w-fit"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold font-mono text-xs rounded-xl transition-all shadow-md shadow-cyan-500/20 w-fit cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>+ Upload Custom CSV</span>
@@ -117,7 +109,7 @@ export function Datasets({ setCurrentPage }) {
             <span className="text-[11px] font-mono text-slate-400">165,929 Instances</span>
           </div>
 
-          <div className="h-64 pt-2">
+          <div className="pt-2">
             <ClassDistributionBarChart />
           </div>
         </div>
@@ -132,7 +124,7 @@ export function Datasets({ setCurrentPage }) {
             <span className="text-[11px] font-mono text-emerald-400 font-bold">Imbalance Handled</span>
           </div>
 
-          <div className="h-56 flex items-center justify-center">
+          <div className="py-2 flex items-center justify-center">
             <ClassDistributionDoughnut />
           </div>
 
@@ -205,7 +197,7 @@ export function Datasets({ setCurrentPage }) {
                   </span>
                   <button
                     onClick={() => setCurrentPage('train')}
-                    className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-mono text-xs rounded-lg transition-colors border border-slate-700"
+                    className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-mono text-xs rounded-lg transition-colors border border-slate-700 cursor-pointer"
                   >
                     Select for Training ➔
                   </button>
@@ -261,14 +253,14 @@ export function Datasets({ setCurrentPage }) {
                 <button
                   type="button"
                   onClick={() => setUploadModalOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
+                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={uploading}
-                  className="px-5 py-2 rounded-lg bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400 transition-colors disabled:opacity-50"
+                  className="px-5 py-2 rounded-lg bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400 transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   {uploading ? 'Profiling & Uploading...' : 'Upload & Profile Dataset'}
                 </button>
@@ -284,7 +276,7 @@ export function Datasets({ setCurrentPage }) {
         setCurrentStep={setCurrentPage}
         prevStep="home"
         nextStep="train"
-        nextStepTitle="Step 2: ML Training Suite & Model Comparison"
+        nextStepTitle="Proceed to Step 2: Training ➔"
       />
     </div>
   );

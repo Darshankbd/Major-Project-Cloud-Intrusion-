@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { ModelComparisonBarChart } from '../components/ChartComponents';
-import { EvaluatorGuide, StepNavigationFooter } from '../components/StepProgress';
+import { StepNavigationFooter } from '../components/StepProgress';
 
 export function TrainML({ setCurrentPage, userRole }) {
   const [selectedDataset, setSelectedDataset] = useState('nsl-kdd');
@@ -82,14 +82,6 @@ export function TrainML({ setCurrentPage, userRole }) {
 
   return (
     <div className="space-y-8 py-4">
-      {/* Evaluator Presentation Guide Script for Step 2 */}
-      <EvaluatorGuide
-        stepNumber="2"
-        title="ML Ensemble Training & Model Comparison"
-        whatToSay='"In Step 2, we train and compare multiple supervised classifiers on an 80/20 train-test split. We contrast our 100-tree Random Forest against a single Decision Tree, SVM, and KNN. Random Forest achieves a 98.6% Accuracy and 98.5% F1-score, outperforming single decision trees by mitigating overfitting through bootstrap bagging."'
-        technicalHighlight="Gini impurity splitting criterion: Gini(D) = 1 - Σ (p_i)^2. Top-performing model is automatically serialized into a standalone deployable .joblib artifact containing fitted StandardScaler weights."
-      />
-
       {/* Title Header matching Fig 4.5.4 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
@@ -108,7 +100,7 @@ export function TrainML({ setCurrentPage, userRole }) {
         <a
           href={api.getModelDownloadUrl(selectedDataset, winnerModel)}
           download
-          className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 rounded-xl text-xs font-mono font-bold transition-all shadow-md w-fit"
+          className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 rounded-xl text-xs font-mono font-bold transition-all shadow-md w-fit cursor-pointer"
         >
           <Download className="w-4 h-4 text-cyan-400" />
           <span>Download Serialized Model (.joblib)</span>
@@ -174,7 +166,7 @@ export function TrainML({ setCurrentPage, userRole }) {
                       type="button"
                       key={algo}
                       onClick={() => toggleAlgorithm(algo)}
-                      className="flex items-center gap-2.5 w-full text-left py-1 text-slate-300 hover:text-white transition-colors"
+                      className="flex items-center gap-2.5 w-full text-left py-1 text-slate-300 hover:text-white transition-colors cursor-pointer"
                     >
                       {isChecked ? (
                         <CheckSquare className="w-4 h-4 text-cyan-400 shrink-0" />
@@ -290,7 +282,7 @@ export function TrainML({ setCurrentPage, userRole }) {
         setCurrentStep={setCurrentPage}
         prevStep="datasets"
         nextStep="graphs"
-        nextStepTitle="Step 3: Performance Graphs & Convergence Curves"
+        nextStepTitle="Proceed to Step 3: Evaluation ➔"
       />
     </div>
   );

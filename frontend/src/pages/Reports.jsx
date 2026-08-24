@@ -14,7 +14,7 @@ import {
   Award
 } from 'lucide-react';
 import { api } from '../services/api';
-import { EvaluatorGuide, StepNavigationFooter } from '../components/StepProgress';
+import { StepNavigationFooter } from '../components/StepProgress';
 
 export function Reports({ setCurrentPage }) {
   const [downloadingPdf, setDownloadingPdf] = useState(false);
@@ -41,14 +41,6 @@ export function Reports({ setCurrentPage }) {
 
   return (
     <div className="space-y-8 py-4">
-      {/* Evaluator Presentation Guide Script for Step 5 */}
-      <EvaluatorGuide
-        stepNumber="5"
-        title="Phase 1 Compliance Audit, PDF Generation & Phase 2 Roadmap"
-        whatToSay='"In Step 5, we compile the comprehensive academic compliance audit. Our backend dynamic ReportLab PDF compiler synthesizes the Level-1 DFD architecture, mathematical formulation matrices (FR01-FR12), and active SQLite audit logs into an executive report. This successfully concludes our Review 1 deliverables."'
-        technicalHighlight="Demonstrates end-to-end alignment with BIS786. Full architectural tables, mathematical formulations, and clear demarcation of Phase 1 completed milestones vs Phase 2 live socket / eBPF future roadmap."
-      />
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
@@ -87,7 +79,7 @@ export function Reports({ setCurrentPage }) {
           <div className="flex items-center gap-1.5 p-1 bg-slate-900 rounded-xl border border-slate-800 text-xs font-mono">
             <button
               onClick={() => setActiveModelTab('dfd')}
-              className={`px-3 py-1 rounded-lg transition-all ${
+              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                 activeModelTab === 'dfd' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -95,7 +87,7 @@ export function Reports({ setCurrentPage }) {
             </button>
             <button
               onClick={() => setActiveModelTab('math')}
-              className={`px-3 py-1 rounded-lg transition-all ${
+              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                 activeModelTab === 'math' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -103,7 +95,7 @@ export function Reports({ setCurrentPage }) {
             </button>
             <button
               onClick={() => setActiveModelTab('threats')}
-              className={`px-3 py-1 rounded-lg transition-all ${
+              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                 activeModelTab === 'threats' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -111,7 +103,7 @@ export function Reports({ setCurrentPage }) {
             </button>
             <button
               onClick={() => setActiveModelTab('defense')}
-              className={`px-3 py-1 rounded-lg transition-all ${
+              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                 activeModelTab === 'defense' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -128,7 +120,7 @@ export function Reports({ setCurrentPage }) {
                 <div className="text-cyan-400 font-bold text-sm">Stage 1.0</div>
                 <div className="text-white font-bold">Data Collection & Ingress</div>
                 <p className="text-[11px] text-slate-400">
-                  Captures NetFlow & benchmark logs (NSL-KDD, CICIDS2017) ➔ Raw Vector $X$.
+                  Captures NetFlow & benchmark logs (NSL-KDD, CICIDS2017) ➔ Raw Vector X.
                 </p>
               </div>
 
@@ -205,7 +197,7 @@ export function Reports({ setCurrentPage }) {
             </div>
             <div className="p-4 rounded-xl bg-slate-950 border border-cyan-500/30 space-y-2">
               <div className="text-cyan-400 font-bold">2. R2L (Unauthorized Access)</div>
-              <p className="text-[11px] text-slate-400">• Failed logins (`num_failed_logins ≥ 4`)<br/>• Remote authentication (`ftp`, `ssh`, `telnet`)<br/>• Interactive duration ($15\text{s}-80\text{s}$)</p>
+              <p className="text-[11px] text-slate-400">• Failed logins (`num_failed_logins ≥ 4`)<br/>• Remote authentication (`ftp`, `ssh`, `telnet`)<br/>• Interactive duration (15s - 80s)</p>
             </div>
             <div className="p-4 rounded-xl bg-slate-950 border border-purple-500/30 space-y-2">
               <div className="text-purple-400 font-bold">3. U2R (Privilege Escalation)</div>
@@ -241,7 +233,7 @@ export function Reports({ setCurrentPage }) {
         setCurrentStep={setCurrentPage}
         prevStep="sandbox"
         nextStep={null}
-        currentStepTitle="Step 5: Phase 1 Compliance Audit & Executive PDF"
+        nextStepTitle=""
       />
     </div>
   );

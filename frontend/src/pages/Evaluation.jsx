@@ -16,7 +16,7 @@ import {
   AccuracyCurveChart, 
   FeatureImportanceBarChart 
 } from '../components/ChartComponents';
-import { EvaluatorGuide, StepNavigationFooter } from '../components/StepProgress';
+import { StepNavigationFooter } from '../components/StepProgress';
 
 export function Evaluation({ setCurrentPage }) {
   const [curvesData, setCurvesData] = useState(null);
@@ -38,14 +38,6 @@ export function Evaluation({ setCurrentPage }) {
 
   return (
     <div className="space-y-8 py-4">
-      {/* Evaluator Presentation Guide Script for Step 3 */}
-      <EvaluatorGuide
-        stepNumber="3"
-        title="Model Evaluation & Loss Convergence Analysis"
-        whatToSay='"In Step 3, we analyze the 50-epoch learning convergence dynamics matching Figure 4.2. Training loss steadily decays to 0.182, while validation loss converges to 0.431 without diverging. Our confusion matrix proves a 98.6% overall accuracy with negligible false alarm rate (< 0.4%)."'
-        technicalHighlight="Generalization gap is constrained within 6.0%, proving robust generalization to zero-day vectors. Feature importance highlights that src_bytes (28.4%) and serror_rate (22.1%) are the primary discriminator features."
-      />
-
       {/* Title Header */}
       <div className="border-b border-slate-800 pb-5">
         <div className="flex items-center gap-2">
@@ -218,7 +210,7 @@ export function Evaluation({ setCurrentPage }) {
         setCurrentStep={setCurrentPage}
         prevStep="train"
         nextStep="sandbox"
-        nextStepTitle="Step 4: Exploit Sandbox & Threat Verification"
+        nextStepTitle="Proceed to Step 4: Exploit Sandbox ➔"
       />
     </div>
   );
