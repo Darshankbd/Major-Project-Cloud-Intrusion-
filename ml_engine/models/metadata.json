@@ -1,0 +1,326 @@
+{
+  "numerical_features": [
+    "duration",
+    "src_bytes",
+    "dst_bytes",
+    "src_pkts",
+    "dst_pkts",
+    "pkt_len_mean",
+    "pkt_len_std",
+    "header_bytes",
+    "payload_entropy",
+    "failed_logins",
+    "iam_risk_score",
+    "same_srv_rate",
+    "diff_srv_rate",
+    "serror_rate",
+    "rerror_rate"
+  ],
+  "categorical_features": [
+    "protocol_type",
+    "service",
+    "flag",
+    "cloud_region"
+  ],
+  "all_transformed_feature_names": [
+    "duration",
+    "src_bytes",
+    "dst_bytes",
+    "src_pkts",
+    "dst_pkts",
+    "pkt_len_mean",
+    "pkt_len_std",
+    "header_bytes",
+    "payload_entropy",
+    "failed_logins",
+    "iam_risk_score",
+    "same_srv_rate",
+    "diff_srv_rate",
+    "serror_rate",
+    "rerror_rate",
+    "protocol_type_ICMP",
+    "protocol_type_TCP",
+    "protocol_type_UDP",
+    "service_C2_Custom",
+    "service_DNS",
+    "service_FTP",
+    "service_HTTP",
+    "service_HTTPS",
+    "service_RDP",
+    "service_SMTP",
+    "service_SSH",
+    "flag_REJ",
+    "flag_RSTO",
+    "flag_S0",
+    "flag_S1",
+    "flag_SF",
+    "cloud_region_ap-south-1",
+    "cloud_region_eu-central-1",
+    "cloud_region_sa-east-1",
+    "cloud_region_us-east-1",
+    "cloud_region_us-west-2"
+  ],
+  "labels": [
+    "BENIGN",
+    "DoS_DDoS",
+    "Port_Scan",
+    "Brute_Force",
+    "Malware_C2",
+    "IAM_Privilege_Escalation"
+  ],
+  "metrics": {
+    "logistic_regression": {
+      "type": "supervised_classifier",
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": [
+        [
+          1822,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          433,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          297,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          207,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          156,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          85
+        ]
+      ]
+    },
+    "random_forest": {
+      "type": "supervised_classifier",
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": [
+        [
+          1822,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          433,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          297,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          207,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          156,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          85
+        ]
+      ]
+    },
+    "xgboost": {
+      "type": "supervised_classifier",
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": [
+        [
+          1822,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          433,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          297,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          207,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          156,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          85
+        ]
+      ]
+    },
+    "isolation_forest": {
+      "type": "unsupervised_anomaly_detector",
+      "accuracy": 0.9183,
+      "precision": 0.863,
+      "recall": 0.9414,
+      "f1_score": 0.9005,
+      "confusion_matrix": [
+        [
+          1646,
+          176
+        ],
+        [
+          69,
+          1109
+        ]
+      ]
+    }
+  },
+  "feature_importances": [
+    {
+      "feature": "rerror_rate",
+      "importance": 0.1309
+    },
+    {
+      "feature": "serror_rate",
+      "importance": 0.1078
+    },
+    {
+      "feature": "header_bytes",
+      "importance": 0.0915
+    },
+    {
+      "feature": "pkt_len_mean",
+      "importance": 0.0867
+    },
+    {
+      "feature": "src_pkts",
+      "importance": 0.0698
+    },
+    {
+      "feature": "pkt_len_std",
+      "importance": 0.0686
+    },
+    {
+      "feature": "src_bytes",
+      "importance": 0.0594
+    },
+    {
+      "feature": "iam_risk_score",
+      "importance": 0.051
+    },
+    {
+      "feature": "payload_entropy",
+      "importance": 0.0503
+    },
+    {
+      "feature": "diff_srv_rate",
+      "importance": 0.049
+    },
+    {
+      "feature": "duration",
+      "importance": 0.0427
+    },
+    {
+      "feature": "dst_pkts",
+      "importance": 0.0411
+    },
+    {
+      "feature": "dst_bytes",
+      "importance": 0.0377
+    },
+    {
+      "feature": "failed_logins",
+      "importance": 0.0358
+    },
+    {
+      "feature": "flag_SF",
+      "importance": 0.0332
+    }
+  ]
+}

@@ -1,140 +1,184 @@
-const API_BASE = (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/$/, '') : '') + '/api';
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-export const api = {
-  // Health
-  getHealth: async () => {
-    const res = await fetch(`${API_BASE}/health`);
-    return res.json();
-  },
+export const API_BASE_URL = isLocal ? "http://127.0.0.1:8000/api" : `${window.location.origin}/api`;
+export const WS_BASE_URL = isLocal 
+  ? "ws://127.0.0.1:8000/ws/live-stream" 
+  : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/live-stream`;
 
-  // Auth
-  login: async (username, password) => {
-    const res = await fetch(`${API_BASE}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    return res.json();
-  },
-
-  register: async (userData) => {
-    const res = await fetch(`${API_BASE}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData)
-    });
-    return res.json();
-  },
-
-  // Datasets
-  getDatasets: async () => {
-    const res = await fetch(`${API_BASE}/datasets`);
-    return res.json();
-  },
-
-  uploadDataset: async (formData) => {
-    const res = await fetch(`${API_BASE}/datasets/upload`, {
-      method: 'POST',
-      body: formData
-    });
-    return res.json();
-  },
-
-  // ML Training & Models
-  trainModels: async (dataset, algorithms) => {
-    const res = await fetch(`${API_BASE}/train`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dataset, algorithms })
-    });
-    return res.json();
-  },
-
-  getTrainingCurves: async (dataset = 'nsl-kdd') => {
-    const res = await fetch(`${API_BASE}/models/curves?dataset=${dataset}`);
-    return res.json();
-  },
-
-  getConfusionMatrix: async (dataset = 'nsl-kdd') => {
-    const res = await fetch(`${API_BASE}/models/confusion-matrix?dataset=${dataset}`);
-    return res.json();
-  },
-
-  getModelDownloadUrl: (dataset, algo) => {
-    return `${API_BASE}/models/download/${dataset}/${encodeURIComponent(algo)}`;
-  },
-
-  // Telemetry & Exploit Sandbox
-  getLiveTelemetryPacket: async () => {
-    const res = await fetch(`${API_BASE}/telemetry/packet`);
-    return res.json();
-  },
-
-  predictVector: async (dataset, packet) => {
-    const res = await fetch(`${API_BASE}/predict`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dataset, packet })
-    });
-    return res.json();
-  },
-
-  simulateExploit: async (payload) => {
-    const res = await fetch(`${API_BASE}/sandbox/simulate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    return res.json();
-  },
-
-  // Dashboard & Alerts
-  getDashboardStats: async () => {
-    const res = await fetch(`${API_BASE}/dashboard/stats`);
-    return res.json();
-  },
-
-  getAlerts: async () => {
-    const res = await fetch(`${API_BASE}/alerts`);
-    return res.json();
-  },
-
-  mitigateAlert: async (alertId) => {
-    const res = await fetch(`${API_BASE}/alerts/${alertId}/mitigate`, {
-      method: 'POST'
-    });
-    return res.json();
-  },
-
-  // History Log
-  getHistory: async (page = 1, limit = 15, search = '', severity = '', attackType = '') => {
-    const params = new URLSearchParams({
-      page,
-      limit,
-      search,
-      severity,
-      attack_type: attackType
-    });
-    const res = await fetch(`${API_BASE}/history?${params.toString()}`);
-    return res.json();
-  },
-
-  // Reports
-  getPdfReportUrl: () => `${API_BASE}/reports/pdf`,
-  getCsvReportUrl: () => `${API_BASE}/reports/csv`,
-
-  // Settings
-  getSettings: async () => {
-    const res = await fetch(`${API_BASE}/settings`);
-    return res.json();
-  },
-
-  saveSettings: async (settings) => {
-    const res = await fetch(`${API_BASE}/settings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(settings)
-    });
-    return res.json();
+export async function loginUser(email, password) {
+  const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail || "Authentication failed");
   }
-};
+  return res.json();
+}
+
+export async function fetchEmployees() {
+  const res = await fetch(`${API_BASE_URL}/org/employees`);
+  if (!res.ok) throw new Error("Failed to fetch employees");
+  return res.json();
+}
+
+export async function addEmployee(employeeData) {
+  const res = await fetch(`${API_BASE_URL}/org/employees`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(employeeData)
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail || "Failed to add employee");
+  }
+  return res.json();
+}
+
+export async function assignResourceToEmployee(userId, resourceData) {
+  const res = await fetch(`${API_BASE_URL}/org/employees/${userId}/assign-resource`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(resourceData)
+  });
+  return res.json();
+}
+
+export async function toggleEmployeeStatus(userId, status) {
+  const res = await fetch(`${API_BASE_URL}/org/employees/${userId}/status`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status })
+  });
+  return res.json();
+}
+
+export async function submitIncidentReport(incidentData) {
+  const res = await fetch(`${API_BASE_URL}/employee/incidents`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(incidentData)
+  });
+  return res.json();
+}
+
+export async function fetchEmployeeIncidents() {
+  const res = await fetch(`${API_BASE_URL}/employee/incidents`);
+  return res.json();
+}
+
+export async function fetchOrgSettings() {
+  const res = await fetch(`${API_BASE_URL}/org/settings`);
+  return res.json();
+}
+
+export async function saveOrgSettings(settingsData) {
+  const res = await fetch(`${API_BASE_URL}/org/settings`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(settingsData)
+  });
+  return res.json();
+}
+
+export async function fetchNotificationLogs() {
+  const res = await fetch(`${API_BASE_URL}/notifications/logs`);
+  return res.json();
+}
+
+export async function fetchPredictFlow(flowData) {
+  const res = await fetch(`${API_BASE_URL}/predict`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(flowData)
+  });
+  if (!res.ok) throw new Error("Prediction API error");
+  return res.json();
+}
+
+export async function fetchTrafficStatus() {
+  const res = await fetch(`${API_BASE_URL}/traffic/status`);
+  if (!res.ok) throw new Error("Traffic status error");
+  return res.json();
+}
+
+export async function startTrafficSimulator() {
+  const res = await fetch(`${API_BASE_URL}/traffic/start`, { method: "POST" });
+  return res.json();
+}
+
+export async function stopTrafficSimulator() {
+  const res = await fetch(`${API_BASE_URL}/traffic/stop`, { method: "POST" });
+  return res.json();
+}
+
+export async function injectAttack(attackType, count = 5) {
+  const res = await fetch(`${API_BASE_URL}/traffic/inject`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ attack_type: attackType, count })
+  });
+  return res.json();
+}
+
+export async function fetchAlerts() {
+  const res = await fetch(`${API_BASE_URL}/alerts`);
+  if (!res.ok) throw new Error("Alerts API error");
+  return res.json();
+}
+
+export async function mitigateAlert(alertId, action = "Block Source IP") {
+  const res = await fetch(`${API_BASE_URL}/alerts/${alertId}/mitigate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action, admin_user: "SOC_Operator" })
+  });
+  return res.json();
+}
+
+export async function fetchMLMetrics() {
+  const res = await fetch(`${API_BASE_URL}/metrics`);
+  if (!res.ok) throw new Error("Metrics API error");
+  return res.json();
+}
+
+export async function triggerRetrain() {
+  const res = await fetch(`${API_BASE_URL}/retrain`, { method: "POST" });
+  return res.json();
+}
+
+export function getReportDownloadUrl() {
+  return `${API_BASE_URL}/reports/pdf`;
+}
+
+export function createWebSocketStream(onMessage, onError) {
+  let ws = new WebSocket(WS_BASE_URL);
+
+  ws.onopen = () => {
+    console.log("WebSocket connected to CloudGuard Live Stream.");
+  };
+
+  ws.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      onMessage(data);
+    } catch (e) {
+      console.error("WS Parse error", e);
+    }
+  };
+
+  ws.onerror = (err) => {
+    console.error("WS Error", err);
+    if (onError) onError(err);
+  };
+
+  ws.onclose = () => {
+    setTimeout(() => {
+      createWebSocketStream(onMessage, onError);
+    }, 3000);
+  };
+
+  return ws;
+}

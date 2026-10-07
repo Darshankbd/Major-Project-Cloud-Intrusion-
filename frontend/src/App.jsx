@@ -1,142 +1,279 @@
-import React, { useState, Component } from 'react';
-import { Navbar } from './components/Navbar';
-import { Footer } from './components/Footer';
-import { AuthModal } from './components/AuthModal';
-import { StepProgressHeader } from './components/StepProgress';
+import React, { useState, useEffect } from 'react';
+import Header from './components/Header';
+import Navbar from './components/Navbar';
+import Login from './components/Login';
+import CommandCenter from './components/CommandCenter';
+import LiveMonitor from './components/LiveMonitor';
+import PacketInspector from './components/PacketInspector';
+import IncidentsHub from './components/IncidentsHub';
+import MLDiagnostics from './components/MLDiagnostics';
+import CloudTopology from './components/CloudTopology';
+import EmployeeManagement from './components/EmployeeManagement';
+import EmployeeDashboard from './components/EmployeeDashboard';
+import NotificationSettings from './components/NotificationSettings';
+import ProjectObjectives from './components/ProjectObjectives';
+import GuardAIChat from './components/GuardAIChat';
+import { Bot } from 'lucide-react';
+import { 
+  createWebSocketStream, 
+  fetchTrafficStatus, 
+  startTrafficSimulator, 
+  stopTrafficSimulator, 
+  fetchAlerts, 
+  fetchMLMetrics 
+} from './services/api';
 
-import { Home } from './pages/Home';
-import { Datasets } from './pages/Datasets';
-import { TrainML } from './pages/TrainML';
-import { Evaluation } from './pages/Evaluation';
-import { ExploitSandbox } from './pages/ExploitSandbox';
-import { Reports } from './pages/Reports';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
-
-// ErrorBoundary to ensure zero blank screen occurrences
-class ErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
+const DEFAULT_USERS = {
+  'admin@cloudguard.io': {
+    id: 'USR-ADMIN-001',
+    email: 'admin@cloudguard.io',
+    full_name: 'Sarah Jenkins (SOC Director)',
+    role: 'ORG_ADMIN',
+    department: 'Global Cyber Command'
+  },
+  'alice@cloudguard.io': {
+    id: 'USR-EMP-001',
+    email: 'alice@cloudguard.io',
+    full_name: 'Alice Smith',
+    role: 'EMPLOYEE',
+    department: 'DevOps Engineering',
+    assigned_resources: [
+      { resource_name: 'Web-Server-01', ip_address: '10.0.1.15', subnet: 'Public Web Subnet (10.0.1.0/24)' }
+    ]
+  },
+  'bob@cloudguard.io': {
+    id: 'USR-EMP-002',
+    email: 'bob@cloudguard.io',
+    full_name: 'Bob Jones',
+    role: 'EMPLOYEE',
+    department: 'IAM & Authentication',
+    assigned_resources: [
+      { resource_name: 'Auth-Server-02', ip_address: '10.0.1.28', subnet: 'Public Web Subnet (10.0.1.0/24)' }
+    ]
+  },
+  'charlie@cloudguard.io': {
+    id: 'USR-EMP-003',
+    email: 'charlie@cloudguard.io',
+    full_name: 'Charlie Brown',
+    role: 'EMPLOYEE',
+    department: 'Data Infrastructure',
+    assigned_resources: [
+      { resource_name: 'DB-Cluster-01', ip_address: '10.0.2.55', subnet: 'Private DB Subnet (10.0.2.0/24)' }
+    ]
   }
+};
 
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
+export default function App() {
+  const [currentUser, setCurrentUser] = useState(null); // null means show Login screen
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isSimulating, setIsSimulating] = useState(true);
+  const [liveLogs, setLiveLogs] = useState([]);
+  const [stats, setStats] = useState({ generated_count: 0, threat_count: 0 });
+  const [alerts, setAlerts] = useState({ summary: {}, alerts: [] });
+  const [mlMetrics, setMlMetrics] = useState(null);
+  const [isAiChatOpen, setIsAiChatOpen] = useState(false);
+  const [theme, setTheme] = useState('midnight');
 
-  componentDidCatch(error, errorInfo) {
-    console.error("ErrorBoundary caught:", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-[#0a0e17] text-white p-6 font-mono">
-          <div className="max-w-lg w-full p-8 rounded-2xl bg-slate-900 border border-rose-500/40 text-center space-y-4 shadow-2xl">
-            <AlertTriangle className="w-12 h-12 text-rose-400 mx-auto animate-bounce" />
-            <h2 className="text-xl font-bold text-white">Temporary Component Reset</h2>
-            <p className="text-xs text-slate-400">
-              {this.state.error?.message || "An interface state reset occurred."}
-            </p>
-            <button
-              onClick={() => {
-                this.setState({ hasError: false, error: null });
-                window.location.reload();
-              }}
-              className="px-6 py-2.5 bg-cyan-500 text-slate-950 font-bold text-xs rounded-xl hover:bg-cyan-400 transition-colors inline-flex items-center gap-2"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span>Reload Interface</span>
-            </button>
-          </div>
-        </div>
-      );
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    if (user.role === 'EMPLOYEE') {
+      setActiveTab('employee_portal');
+    } else {
+      setActiveTab('overview');
     }
-    return this.props.children;
-  }
-}
-
-export function App() {
-  const [currentPage, setCurrentPage] = useState('home');
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [user, setUser] = useState({
-    username: 'admin_darshan',
-    role: 'Admin',
-    email: 'admin@cloudids.local'
-  });
+  };
 
   const handleLogout = () => {
-    setUser(null);
+    setCurrentUser(null);
+    localStorage.removeItem('cloudguard_user');
   };
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return (
-          <Home 
-            setCurrentPage={setCurrentPage} 
-            user={user} 
-            setUser={setUser} 
-            onOpenAuth={() => setAuthModalOpen(true)} 
-          />
-        );
-      case 'datasets':
-        return <Datasets setCurrentPage={setCurrentPage} userRole={user?.role} />;
-      case 'train':
-        return <TrainML setCurrentPage={setCurrentPage} userRole={user?.role} />;
-      case 'graphs':
-        return <Evaluation setCurrentPage={setCurrentPage} />;
-      case 'sandbox':
-        return <ExploitSandbox setCurrentPage={setCurrentPage} />;
-      case 'reports':
-        return <Reports setCurrentPage={setCurrentPage} />;
-      default:
-        return (
-          <Home 
-            setCurrentPage={setCurrentPage} 
-            user={user} 
-            setUser={setUser} 
-            onOpenAuth={() => setAuthModalOpen(true)} 
-          />
-        );
+  const handlePersonaSwitch = (email) => {
+    const user = DEFAULT_USERS[email] || DEFAULT_USERS['admin@cloudguard.io'];
+    setCurrentUser(user);
+    if (user.role === 'EMPLOYEE') {
+      setActiveTab('employee_portal');
+    } else {
+      setActiveTab('overview');
     }
   };
 
+  const handleThemeChange = (newTheme) => {
+    setTheme(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
+
+  const loadBackendData = async () => {
+    try {
+      const statusData = await fetchTrafficStatus();
+      setStats(statusData);
+      setIsSimulating(statusData.is_running);
+
+      const alertData = await fetchAlerts();
+      setAlerts(alertData);
+
+      const metricsData = await fetchMLMetrics();
+      setMlMetrics(metricsData);
+    } catch (e) {
+      console.error("Backend fetch error", e);
+    }
+  };
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    loadBackendData();
+
+    const ws = createWebSocketStream((newFlow) => {
+      setLiveLogs((prevLogs) => [newFlow, ...prevLogs.slice(0, 100)]);
+      setStats((prevStats) => ({
+        ...prevStats,
+        generated_count: prevStats.generated_count + 1,
+        threat_count: newFlow.severity !== 'LOW' ? prevStats.threat_count + 1 : prevStats.threat_count
+      }));
+
+      if (newFlow.severity === 'CRITICAL' || newFlow.severity === 'HIGH') {
+        fetchAlerts().then(setAlerts).catch(console.error);
+      }
+    });
+
+    return () => {
+      if (ws) ws.close();
+    };
+  }, []);
+
+  const handleToggleSimulator = async () => {
+    try {
+      if (isSimulating) {
+        await stopTrafficSimulator();
+        setIsSimulating(false);
+      } else {
+        await startTrafficSimulator();
+        setIsSimulating(true);
+      }
+    } catch (e) {
+      console.error("Failed to toggle simulator", e);
+    }
+  };
+
+  const handleSpeedChange = async (interval) => {
+    try {
+      await fetch('http://127.0.0.1:8000/api/traffic/speed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ interval })
+      });
+    } catch (e) {
+      console.error("Failed to update simulator speed", e);
+    }
+  };
+
+  const activeAlertCount = alerts?.summary?.active || 0;
+
+  // Render Login interface if user is not authenticated
+  if (!currentUser) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
-    <ErrorBoundary>
-      <div className="min-h-screen flex flex-col bg-[#0a0e17] text-slate-100 selection:bg-cyan-500 selection:text-black">
-        {/* Top Navbar */}
-        <Navbar
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          user={user}
-          onOpenAuth={() => setAuthModalOpen(true)}
-          onLogout={handleLogout}
-        />
+    <div className="min-h-screen p-4 sm:p-6 lg:px-12 lg:py-8 max-w-[1520px] mx-auto space-y-8 relative transition-colors duration-500">
+      {/* Header */}
+      <Header
+        isSimulating={isSimulating}
+        onToggleSimulator={handleToggleSimulator}
+        generatedCount={stats.generated_count}
+        threatCount={stats.threat_count}
+        currentTheme={theme}
+        onThemeChange={handleThemeChange}
+        currentUser={currentUser}
+        onPersonaSwitch={handlePersonaSwitch}
+        onLogout={handleLogout}
+      />
 
-        {/* Synchronous Step Progress Header */}
-        <StepProgressHeader
-          currentStep={currentPage}
-          setCurrentStep={setCurrentPage}
-          userRole={user?.role || 'Admin'}
-        />
+      {/* Navigation Tabs */}
+      <Navbar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        activeAlertCount={activeAlertCount}
+        userRole={currentUser.role}
+      />
 
-        {/* Main Content Viewport */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {renderPage()}
-        </main>
+      {/* Main Content View Switcher */}
+      <main className="space-y-8">
+        {activeTab === 'overview' && (
+          <CommandCenter
+            stats={stats}
+            liveLogs={liveLogs}
+            alerts={alerts}
+            mlMetrics={mlMetrics}
+            onSpeedChange={handleSpeedChange}
+          />
+        )}
 
-        {/* Footer */}
-        <Footer />
+        {activeTab === 'objectives' && (
+          <ProjectObjectives onNavigateTab={setActiveTab} />
+        )}
 
-        {/* Authentication Modal */}
-        <AuthModal
-          isOpen={authModalOpen}
-          onClose={() => setAuthModalOpen(false)}
-          onAuthSuccess={(userData) => setUser(userData)}
-        />
+        {activeTab === 'employees' && (
+          <EmployeeManagement />
+        )}
+
+        {activeTab === 'employee_portal' && (
+          <EmployeeDashboard currentUser={currentUser} liveLogs={liveLogs} />
+        )}
+
+        {activeTab === 'live' && (
+          <LiveMonitor liveLogs={liveLogs} />
+        )}
+
+        {activeTab === 'inspector' && (
+          <PacketInspector />
+        )}
+
+        {activeTab === 'incidents' && (
+          <IncidentsHub
+            alerts={alerts}
+            onRefreshAlerts={() => fetchAlerts().then(setAlerts)}
+          />
+        )}
+
+        {activeTab === 'notifications' && (
+          <NotificationSettings />
+        )}
+
+        {activeTab === 'analytics' && (
+          <MLDiagnostics
+            mlMetrics={mlMetrics}
+            onRefreshMetrics={() => fetchMLMetrics().then(setMlMetrics)}
+          />
+        )}
+
+        {activeTab === 'topology' && (
+          <CloudTopology alerts={alerts} />
+        )}
+      </main>
+
+      {/* Floating GuardAI Assistant Trigger Button */}
+      <div className="fixed bottom-8 right-8 z-40">
+        <button
+          onClick={() => setIsAiChatOpen(!isAiChatOpen)}
+          className="p-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-2xl hover:scale-105 transition flex items-center gap-2 font-mono text-xs font-bold border border-blue-400/40"
+        >
+          <Bot className="w-5 h-5 animate-bounce" />
+          <span>GuardAI Specialist</span>
+        </button>
       </div>
-    </ErrorBoundary>
+
+      {/* GuardAI Chat Modal */}
+      <GuardAIChat
+        isOpen={isAiChatOpen}
+        onClose={() => setIsAiChatOpen(false)}
+      />
+
+      {/* Global Footer */}
+      <footer className="pt-10 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 font-mono gap-4">
+        <p>Cloud Intrusion Detection System — Enterprise Organization & Employee Intrusion Defense Platform</p>
+        <p>Built with FastAPI • SQLite RBAC • XGBoost • Scikit-Learn • React • WebSockets</p>
+      </footer>
+    </div>
   );
 }
-
-export default App;
