@@ -48,3 +48,5 @@ backend/models/*.joblib
 !backend/models/.gitkeep
 backend/data/*.csv
 !backend/data/.gitkeep
+
+.vercel
